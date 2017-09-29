@@ -1,5 +1,5 @@
 <?php
-if (!empty($login)){
+if (!empty($_SESSION['login'])){
     //render_sidebar();
 }
 else{
