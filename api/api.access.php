@@ -80,6 +80,54 @@ function get_field_right($admin,$module,$fieldid,$right = 'read',$ignoresuperadm
 }
 
 
+function get_action_right($admin,$module,$actionid,$right = 'execute',$ignoresuperadmin = false){
+    $admin = vf($admin);
+    $module = vf($module, 4);
+    $actionid = vf($actionid, 3);
+    $issuperadmin = is_superadmin($admin);
+    if ($right != 'execute'){
+        $right = 'execute';
+    }
+    $table = table_exists('modules_'.$module.'_field_rights');
+    if ($table){
+        $userid = get_user_id($admin);
+        $query = "SELECT user_".$right."_right FROM modules_".$module."_action_rights WHERE userid='".$userid."' AND action_id='".$actionid."'";
+        $result = simple_query($query);
+        $result = $result['user_'.$right.'_right'];
+        if ($result == 1){
+            $result = true;
+        }
+        else{
+            if (!$ignoresuperadmin){
+                if ($issuperadmin){
+                    $result = true;
+                }
+                else{
+                    $result = false;
+                }
+            }
+            else{
+                $result = false;
+            }
+        }
+        
+    }
+    else{
+        if (!$ignoresuperadmin){
+            if ($issuperadmin){
+                $result = true;
+            }
+            else{
+                $result = false;
+            }
+        }
+        else{
+            $result = false;
+        }
+    }
+    return($result);
+}
+
 function get_right($admin,$module,$right = 'read',$ignoresuperadmin = false){
     $admin = vf($admin);
     $module = vf($module, 4);
@@ -185,6 +233,32 @@ function set_field_right($module,$admin,$fieldid,$value = 0,$right = 'read'){
     nr_query($query);
 }
 
+
+function set_action_right($module,$admin,$actionid,$value = 0,$right = 'execute'){
+    $admin = vf($admin);
+    $module = vf($module, 4);
+    $actionid = vf($actionid,3);
+    
+    if ($value != 0 && $value != 1){
+        $value = 0;
+    }
+    if ($right != 'execute'){
+        $right = 'execute';
+    }
+    $table = table_exists('modules_'.$module.'_action_rights');
+    $userid = get_user_id($admin);
+    if ($table){
+        $query = "SELECT userid FROM modules_".$module."_action_rights WHERE userid='".$userid."' AND action_id='".$actionid."'";
+        $entry = simple_query($query);
+        if (!empty($entry)){
+            $query = "UPDATE modules_".$module."_action_rights SET user_".$right."_right='".$value."' WHERE userid='".$userid."' AND action_id='".$actionid."'";
+        }
+        else{
+            $query = "INSERT INTO modules_".$module."_action_rights (userid, action_id, user_".$right."_right) VALUES ('".$userid."','".$actionid."','".$value."')";
+        }
+    }
+    nr_query($query);
+}
 
 
 

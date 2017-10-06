@@ -207,21 +207,17 @@ function render_user_module_list(){
                     . "                     </a>"
                     . "                 </td>"
                     . "                 <td class=center-align>"
-                    . "                     <a class='waves-effect light-blue waves-light btn' href='index.php?module=modules&moduleedit=".htmlspecialchars($module)."&action=import'>"
-                    . "                         Импорт данных"
-                    . "                     </a>"
-                    . "                      <p></p>"
-                    . "                     <a class='waves-effect light-blue waves-light btn' href='index.php?module=modules&moduleedit=".htmlspecialchars($module)."&action=fieldrights'>"
-                    . "                         Права доступа"
-                    . "                     </a>"
-                    . "                 </td>"
-                    . "                 <td class=center-align>"
                     . "                     <a class='waves-effect light-blue waves-light btn' href='index.php?module=modules&moduleedit=".htmlspecialchars($module)."&action=massactions'>"
                     . "                         Массовые действия"
                     . "                     </a>"
                     . "                     <p></p>"
                     . "                     <a class='waves-effect light-blue waves-light btn' href='index.php?module=modules&moduleedit=".htmlspecialchars($module)."&action=deletemodule'>"
                     . "                         Удалить модуль"
+                    . "                     </a>"
+                    . "                 </td>"
+                    . "                 <td class=center-align>"
+                    . "                     <a class='waves-effect light-blue waves-light btn' href='index.php?module=modules&moduleedit=".htmlspecialchars($module)."&action=import'>"
+                    . "                         Импорт данных"
                     . "                     </a>"
                     . "                 </td>"
                     . "             </tr>";
@@ -376,71 +372,69 @@ function render_import($module,$csvarr=''){
     print($result);
 }
 
-function render_field_rights($module){
+function render_field_rights($admin,$module){
     $fields = get_fields($module);
-    $admins = get_admin_list();
-    if (!empty($fields)){
-    $result = "<form action='/index.php?module=modules&moduleedit=".htmlspecialchars($module)."&action=fieldrights' method=post>"
-            . "     <table>"
-            . "         <tr>"
-            . "             <th>"
-            . "                 Админ"
-            . "             </th>";
-            foreach ($fields as $field){
-            $result .= "        <th>"
-                    . htmlspecialchars($field['name'])
-                    . "         </td>";
+    if ($fields){
+        $result = '<div class="row"><div class="row"><b>Поля</b></div>';
+        foreach ($fields as $field){
+            $result .= "<div class='row'>"
+                    . "     <div class='col s6'>"
+                    . "        <input type='hidden' name='newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][read]' value=''>"
+                    . "        <input type='hidden' name='newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][write]' value=''>";
+            if (get_field_right($admin, $module, $field['id'],'read',true)){
+                $result .= "         <input id='newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][read]' name='newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][read]' type='checkbox' checked='checked' class='filled-in'>"
+                        . "         <label for=newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][read]>Чтение</label>";
             }
-    $result .= "        </tr>";
-    foreach ($admins as $admin){
-        $result .= "<tr>"
-                . "     <td>"
-                . "         <input type='hidden' name=newrights[".htmlspecialchars($admin['id'])."]>"
-                . htmlspecialchars($admin['login'])
-                . "     </td>";
-                foreach ($fields as $field){
-                    $result .= "        <td>"
-                            . "             <input type='hidden' name=newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."]>";
-                    if (get_field_right($admin['login'], $module, $field['id'],'read',true)){
-                        $result .= "            <input id='newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][read]' name='newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][read]' type='checkbox' checked='checked' class='filled-in'>"
-                                . "             <label for=newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][read]>Чтение</label>";
-                    }
-                    else{
-                        $result .= "            <input id='newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][read]' name='newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][read]' type='checkbox' class='filled-in'>"
-                                . "             <label for=newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][read]>Чтение</label>";
-                    }
-                    $result .= "<br>";
-                    if (get_field_right($admin['login'], $module, $field['id'],'write',true)){
-                        $result .= "            <input id='newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][write]' name='newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][write]' type='checkbox' checked='checked' class='filled-in'>"
-                                . "             <label for=newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][write]>Запись</label>";
-                    }
-                    else{
-                        $result .= "            <input id='newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][write]' name='newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][write]' type='checkbox' class='filled-in'>"
-                                . "             <label for=newrights[".htmlspecialchars($admin['id'])."][".htmlspecialchars($field['id'])."][write]>Запись</label>";
-                    }
-                    $result .= "</td>";
-                }
-        $result .= "</tr>";
-                
+            else{
+                $result .= ""
+                        . "         <input id='newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][read]' name='newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][read]' type='checkbox' class='filled-in'>"
+                        .  "         <label for=newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][read]>Чтение</label>";
+            }
+            $result .= "<br>";
+            if (get_field_right($admin, $module, $field['id'],'write',true)){
+                $result .= "         <input id='newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][write]' name='newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][write]' type='checkbox' checked='checked' class='filled-in'>"
+                        . "         <label for=newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][write]>Запись</label>";
+            }
+            else{
+                $result .= "         <input id='newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][write]' name='newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][write]' type='checkbox' class='filled-in'>"
+                        . "         <label for=newfieldrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($field['id'])."][write]>Запись</label>";
+            }
         
-    }
-    $result .= "<tr>"
-            . "     <td>"
-            . "          <button class='btn waves-effect light-blue' type='submit' name='setfieldrights'>"
-            . "              Сохранить"
-            . "          </button>"
-            . "     </td>"
-            . "</tr>"
-            . "</table>"
-            . "</form>";
-    print($result);
-    }
-    else{
-        message_box('Нет доступных полей для назнечения прав доступа');
-        redirect('/index.php?module=modules');
+        
+            $result .= "</div>     <div class='col s6'><p class='valign-wrapper'>"
+                    .           htmlspecialchars($field['name'])
+                    ."     </p></div>"
+                    . "</div>";
+        }
+        $result .= "</div>";
+        print($result);
     }
 }
 
+function render_action_rights($admin,$module){
+    $actions = get_all_actions($module);
+    if ($actions){
+        $result = '<div class="row"><div class="row"><b>Действия</b></div>';
+        foreach ($actions as $action){
+            $result .= "<div class='row'>"
+                    . "     <div class='col s12'>"
+                    . "        <input type='hidden' name='newactionrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($action['id'])."][execute]' value=''>";
+            if (get_action_right($admin, $module, $action['id'],'execute',true)){
+                $result .= "         <input id='newactionrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($action['id'])."][execute]' name='newactionrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($action['id'])."][execute]' type='checkbox' checked='checked' class='filled-in'>"
+                        . "         <label for=newactionrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($action['id'])."][execute]>".htmlspecialchars($action['name'])."</label>";
+            }
+            else{
+                $result .= "         <input id='newactionrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($action['id'])."][execute]' name='newactionrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($action['id'])."][execute]' type='checkbox' class='filled-in'>"
+                        . "         <label for=newactionrights[".$module."][".htmlspecialchars(get_user_id($admin))."][".htmlspecialchars($action['id'])."][execute]>".htmlspecialchars($action['name'])."</label>";
+            }
+        
+        
+            $result .= "</div></div>";
+        }
+        $result .= "</div>";
+        print($result);
+    }
+}
 
 
 function message_box($text){
@@ -1043,6 +1037,7 @@ function render_module_actions($module,$entryid){
     $module = vf($module,4);
     $entryid = vf($entryid, 3);
     $result = "";
+    
     if (!empty($module)){
         $actions = get_all_actions($module);
         $result .= "<form action='index.php?module=".$module."&entry=".$entryid."' method=post>"
@@ -1051,14 +1046,16 @@ function render_module_actions($module,$entryid){
         $i = 0;
         if (!empty($actions)){
             foreach ($actions as $action){
-                $i++;
-                $result.="<td>"
-                        . '       <button class="btn waves-effect light-blue" type="submit" name="action['.$action['id'].']">'
-                        .               htmlspecialchars($action['name'])
-                        . '        </button>'
-                        . '</td>';
-                if($i%5 == 0){
-                    $result.= "<tr></tr>";
+                if(get_action_right(whoami(), $module, $action['id'])){
+                    $i++;
+                    $result.="<td>"
+                            . '       <button class="btn waves-effect light-blue" type="submit" name="action['.$action['id'].']">'
+                            .               htmlspecialchars($action['name'])
+                            . '        </button>'
+                            . '</td>';
+                    if($i%5 == 0){
+                        $result.= "<tr></tr>";
+                    }
                 }
             }
         }

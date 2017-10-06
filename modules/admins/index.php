@@ -80,21 +80,25 @@ elseif(isset($_GET['action']) && isset($_GET['admin']) && get_right(whoami(), $_
                     $currentwriteright = get_right($admin, $module,'write');
                     
                     print('<div class="col s3">');
-                    print('<div class="row"><h5>'.$modulename.'</h5></div>');
+                    print('<div class="row"><h5>'.$modulename.'</h5></div><div class="col s12">');
                     if ($currentreadright){
-                        print('<div class="row"><p><input type="checkbox" class="filled-in" id="module_'.$module.'_read" name="module_'.$module.'_read" checked="checked"><label for="module_'.$module.'_read">Чтение</label></p></div>');
+                        print('<div class="row"><input type="checkbox" class="filled-in" id="module_'.$module.'_read" name="module_'.$module.'_read" checked="checked"><label for="module_'.$module.'_read">Чтение</label>');
                     }
                     else{
-                        print('<div class="row"><p><input type="checkbox" class="filled-in" id="module_'.$module.'_read" name="module_'.$module.'_read"><label for="module_'.$module.'_read">Чтение</label></p></div>');
+                        print('<div class="row"><input type="checkbox" class="filled-in" id="module_'.$module.'_read" name="module_'.$module.'_read"><label for="module_'.$module.'_read">Чтение</label>');
                     }
+                    print('<br>');
                     if ($currentwriteright){
-                        print('<div class="row"><p><input type="checkbox" class="filled-in" id="module_'.$module.'_write" name="module_'.$module.'_write" checked="checked"><label for="module_'.$module.'_write">Запись</label></p></div>');
+                        print('<input type="checkbox" class="filled-in" id="module_'.$module.'_write" name="module_'.$module.'_write" checked="checked"><label for="module_'.$module.'_write">Запись</label></div>');
                     }
                     else{
-                        print('<div class="row"><p><input type="checkbox" class="filled-in" id="module_'.$module.'_write" name="module_'.$module.'_write"><label for="module_'.$module.'_write">Запись</label></p></div>');
+                        print('<input type="checkbox" class="filled-in" id="module_'.$module.'_write" name="module_'.$module.'_write"><label for="module_'.$module.'_write">Запись</label></div>');
                     }
                     print('</div>');
                     
+                    render_field_rights($admin, $module);
+                    render_action_rights($admin, $module);
+                    print('</div>');
                 }
                 print('</div></div>');
             }
@@ -130,6 +134,64 @@ elseif(isset($_GET['action']) && isset($_GET['admin']) && get_right(whoami(), $_
                     set_right($module, $admin, $value, $right);
                 }
             }
+            if (isset($_POST['newfieldrights'])){  
+                $modules = $_POST['newfieldrights'];
+                foreach ($modules as $module => $admins){
+                    foreach ($admins as $admin => $fieldrights){
+                        $admin = get_user_name($admin);
+                        foreach ($fieldrights as $field => $rights){
+                            if (!empty($rights)){
+                                if($rights['read'] == "on"){
+                                    $value = 1;
+                                    $right = 'read';
+                                    set_field_right($module, $admin, $field, $value, $right);
+                                }
+                                else{
+                                    $value = 0;
+                                    $right = 'read';
+                                    set_field_right($module, $admin, $field, $value, $right);
+                                }
+                                if($rights['write'] == "on"){
+                                    $value = 1;
+                                    $right = 'write';
+                                    set_field_right($module, $admin, $field, $value, $right);
+                                }
+                                else{
+                                    $value = 0;
+                                    $right = 'write';
+                                    set_field_right($module, $admin, $field, $value, $right);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            
+            if (isset($_POST['newactionrights'])){  
+                $modules = $_POST['newactionrights'];
+                foreach ($modules as $module => $admins){
+                    foreach ($admins as $admin => $actionrights){
+                        $admin = get_user_name($admin);
+                        foreach ($actionrights as $action => $rights){
+                            if (!empty($rights)){
+                                if($rights['execute'] == "on"){
+                                    $value = 1;
+                                    $right = 'execute';
+                                    set_action_right($module, $admin, $action, $value, $right);
+                                }
+                                else{
+                                    $value = 0;
+                                    $right = 'execute';
+                                    set_action_right($module, $admin, $action, $value, $right);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            
             if (isset($_POST['superadmin'])){
                 $value = '1';
             }

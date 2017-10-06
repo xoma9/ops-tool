@@ -32,23 +32,24 @@ function perform_action($module,$actionid,$entryid){
     $actionid = vf($actionid, 3);
     $entryid = vf($entryid,3);
     $action = get_action($module, $actionid);
-    if (!empty($action)){
-        $script = $action['script'];
-        $args = $action['args'];
-        $scriptext = explode('.', $script);
-        if (isset($scriptext['1'])){
-            $extension = $scriptext['1'];
+    if(get_action_right(whoami(), $module, $actionid)){
+        if (!empty($action)){
+            $script = $action['script'];
+            $args = $action['args'];
+            $scriptext = explode('.', $script);
+            if (isset($scriptext['1'])){
+                $extension = $scriptext['1'];
+            }
+            else{
+                $extension = '';
+            }
+            $interpreter = get_interpreter($extension);
+            $argsforscript = parse_args($args,$module,$entryid);
+            $command = $interpreter.' '.SCRIPT_PATH.'/'.$script.' '.$argsforscript;
         }
-        else{
-            $extension = '';
-        }
-        $interpreter = get_interpreter($extension);
-        $argsforscript = parse_args($args,$module,$entryid);
-        $command = $interpreter.' '.SCRIPT_PATH.'/'.$script.' '.$argsforscript;
+        $result = shell_exec($command);
+        render_material_window("Результат выполнения ".$command.":", $result);
     }
-    $result = shell_exec($command);
-    //$result = shell_exec('whereis python');
-    render_material_window("Результат выполнения ".$command.":", $result);
 }
 
 
@@ -417,6 +418,11 @@ function create_module_actions_table($module){
     create_table("modules_".$module."_actions",Array('name' =>'VARCHAR(255)', 'script' => 'VARCHAR(255)', 'args' => 'TEXT'));
 }
 
+function create_module_action_rights_table($module){
+    $module = vf($module, 4);
+    create_table("modules_".$module."_action_rights",Array('userid' =>'INT(11)', 'action_id' => 'INT(11)', 'user_execute_right' => 'TINYINT(1)'));
+}
+
 function create_module_entries_table($module){
     $module = vf($module, 4);
     create_table("modules_".$module."_entries",Array('name' => 'VARCHAR(255)'));
@@ -430,6 +436,7 @@ function create_all_module_tables($module){
     create_module_fields_table($module);
     create_module_right_table($module);
     create_module_entries_table($module);
+    create_module_action_rights_table($module);
 }
 
 function delete_all_module_tables($module){
@@ -439,12 +446,15 @@ function delete_all_module_tables($module){
     nr_query($query);
     $query = 'DROP TABLE IF EXISTS modules_'.$module.'_field_rights';
     nr_query($query);
+    $query = 'DROP TABLE IF EXISTS modules_'.$module.'_action_rights';
+    nr_query($query);
     $query = 'DROP TABLE IF EXISTS modules_'.$module.'_fields';
     nr_query($query);
     $query = 'DROP TABLE IF EXISTS modules_'.$module.'_rights';
     nr_query($query);
     $query = 'DROP TABLE IF EXISTS modules_'.$module.'_entries';
     nr_query($query);
+    
 }
 
 

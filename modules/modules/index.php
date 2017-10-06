@@ -92,38 +92,6 @@ if (get_right(whoami(), current_module())){
                     
                     }
                 }
-                elseif ($action == 'fieldrights'){
-                    render_field_rights($module);
-                    if (isset($_POST['setfieldrights'])){
-                        $admins = $_POST['newrights'];
-                        foreach ($admins as $admin => $fieldrights){
-                            $admin = get_user_name($admin);
-                            foreach ($fieldrights as $field => $rights){
-                                print_r($rights['read']);
-                                if (empty($rights)){
-                                  $value = 0;
-                                  $right = 'read';
-                                  set_field_right($module, $admin, $field, $value, $right);
-                                  $right = 'write';
-                                  set_field_right($module, $admin, $field, $value, $right);
-                                }
-                                else{
-                                    if(!empty($rights['read'])){
-                                        $value = 1;
-                                        $right = 'read';
-                                        set_field_right($module, $admin, $field, $value, $right);
-                                    }
-                                    if(!empty($rights['write'])){
-                                        $value = 1;
-                                        $right = 'write';
-                                        set_field_right($module, $admin, $field, $value, $right);
-                                    }
-                                }
-                            }
-                        }
-                        update_page();
-                    }
-                }
                 elseif($action == 'import'){
                     if (is_uploaded_file($_FILES['uploadedscript']['tmp_name']) && isset($_FILES)){
                         move_uploaded_file($_FILES["uploadedscript"]["tmp_name"], TMP_PATH.'/'. 'import.csv');
