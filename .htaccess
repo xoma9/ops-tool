@@ -1,0 +1,8 @@
+Order Deny,Allow
+Allow from 127.0.0.1
+Allow from all
+
+<FilesMatch "\.(py|sh|ini|bat|pl)$"> 
+	  Deny from all
+</FilesMatch>
+

@@ -67,10 +67,13 @@ function render_sidebar(){
             $counter = 0;
             $modules = get_module_list();
             foreach ($modules as $module){
-                $moduleconfig = parse_ini_file(MODULE_PATH."/".htmlspecialchars($module)."/moduleconfig.ini");
-                $modulecategory = $moduleconfig['category'];
-                if (get_right($admin, $module) && $modulecategory == $categoryid){
-                    $counter++;
+                if (is_file(MODULE_PATH."/".htmlspecialchars($module)."/moduleconfig.ini")){
+                    $moduleconfig = parse_ini_file(MODULE_PATH."/".htmlspecialchars($module)."/moduleconfig.ini");
+                
+                    $modulecategory = $moduleconfig['category'];
+                    if (get_right($admin, $module) && $modulecategory == $categoryid){
+                        $counter++;
+                    }
                 }
             }
             
@@ -80,16 +83,18 @@ function render_sidebar(){
                 $result .="<a href='#!' class='collection-header'><h4>".$category['name']."</h4></a>"; 
                 $modules = array_diff(scandir(MODULE_PATH), array('..', '.'));
                 foreach ($modules as $module){
-                    $moduleconfig = parse_ini_file(MODULE_PATH."/".htmlspecialchars($module)."/moduleconfig.ini");
-                    $modulecategory = $moduleconfig['category'];
-                    if (get_right($admin, $module) && $modulecategory == $categoryid){
-                        
-                        $modulename = $moduleconfig['modulename'];
-                        if ($currentmodule == $module){
-                            $result .= "<a href='/index.php?module=".htmlspecialchars($module)."' class='collection-item active blue'>".htmlspecialchars($modulename)."</a>";
-                        }
-                        else{
-                            $result .= "<a href='/index.php?module=".htmlspecialchars($module)."' class='collection-item blue-text text-darken-2 z-depth-2'>".htmlspecialchars($modulename)."</a>";
+                    if (is_file(MODULE_PATH."/".htmlspecialchars($module)."/moduleconfig.ini")){
+                        $moduleconfig = parse_ini_file(MODULE_PATH."/".htmlspecialchars($module)."/moduleconfig.ini");
+                        $modulecategory = $moduleconfig['category'];
+                        if (get_right($admin, $module) && $modulecategory == $categoryid){
+                            
+                            $modulename = $moduleconfig['modulename'];
+                            if ($currentmodule == $module){
+                                $result .= "<a href='/index.php?module=".htmlspecialchars($module)."' class='collection-item active blue'>".htmlspecialchars($modulename)."</a>";
+                            }
+                            else{
+                                $result .= "<a href='/index.php?module=".htmlspecialchars($module)."' class='collection-item blue-text text-darken-2 z-depth-2'>".htmlspecialchars($modulename)."</a>";
+                            }
                         }
                     }
                 }
@@ -464,7 +469,7 @@ function render_module($module,$massaction = '0'){
         }    
     }
     if ($massaction == '1'){
-        $result .= "<th class='left-align no-sort'>"
+        $result .= "<th class='left-align sorting_disabled'>"
                 . "     <input type='checkbox' id='checkall' name='checkall' class='filled-in' onchange='checkAll(this)'>"
                 . "     <label for='checkall'></label>"
                 . "</th>";

@@ -105,7 +105,7 @@
                 <nav class="top-nav">
                     <div class="nav-wrapper light-blue darken-1">
                         <a class="brand-logo" href="#">ops-tool</a>
-                        <?render_logout_button()?>
+                        <?php render_logout_button() ?>
                     </div>
                 </nav>
         </header>
