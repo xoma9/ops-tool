@@ -45,9 +45,10 @@ function perform_action($module,$actionid,$entryid){
             }
             $interpreter = get_interpreter($extension);
             $argsforscript = parse_args($args,$module,$entryid);
-            $command = $interpreter.' '.SCRIPT_PATH.'/'.$script.' '.$argsforscript;
+            $command = $interpreter.' '.SCRIPT_PATH.'/'.$script.' '.$argsforscript.' 2>&1';
         }
         $result = shell_exec($command);
+		$result = nl2br($result);
         render_material_window("Результат выполнения ".$command.":", $result);
     }
 }
@@ -116,6 +117,25 @@ function get_field_content($module,$fieldid,$moduleentryid){
     return($result);
 }
 
+
+function get_all_field_content($module){
+    $module = vf($module, 4);
+    $table = table_exists('modules_'.$module.'_field_entries');
+    if ($table){
+        $query = "SELECT field_id,module_entry_id,content FROM modules_".$module."_field_entries";
+        $someresult = simple_queryall($query);
+		//$result = $someresult;
+		foreach($someresult as $field_entry){
+			$result[$field_entry['module_entry_id']][$field_entry['field_id']] = $field_entry['content'];
+		}
+    }
+    else{
+        $result = "";
+    }
+    return($result);
+}
+
+
 function get_field($module,$fieldid){
     $module = vf($module, 4);
     $fieldid = vf($fieldid, 3);
@@ -175,6 +195,8 @@ function get_module_entries($module){
     }
     return $result;
 }
+
+
 
 function create_module_entry($module,$entryname){
     $entryname = mysql_real_escape_string($entryname);
@@ -517,7 +539,7 @@ function set_action($module,$actionid,$script,$args,$name){
     $module = vf($module, 4);
     $actionid = vf($actionid, 3);
     $script = mysql_real_escape_string($script);
-    $args = mysql_real_escape_string($args);
+    $args = $args;
     $name = mysql_real_escape_string($name);
     $table = table_exists("modules_".$module."_actions");
     if ($table){

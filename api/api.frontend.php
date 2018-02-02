@@ -462,8 +462,10 @@ function render_module($module,$massaction = '0'){
             . "         <th width=2%>ID</th>"
             . "         <th class=head>Имя</th>";
     if ($fields != false){
+		$fieldrigts = Array();
         foreach ($fields as $field){
-            if(get_field_right(whoami(), $module, $field['id'])){
+			$fieldrights[$field['id']]=get_field_right(whoami(), $module, $field['id']);
+            if($fieldrights[$field['id']]){
                 $result .= '<th>'.htmlspecialchars($field['name']).'</th>';
             }
         }    
@@ -480,6 +482,8 @@ function render_module($module,$massaction = '0'){
 
     $entries = get_module_entries($module);
     if(!empty($entries)){
+		$allcontent=get_all_field_content($module);
+		//print_r($allcontent);
         foreach ($entries as $entryarr){
             $entryid = $entryarr['id'];
             $entryname = $entryarr['name'];
@@ -492,9 +496,9 @@ function render_module($module,$massaction = '0'){
                     . " </td>";
             if ($fields != false){
                 foreach ($fields as $field){
-                        if(get_field_right(whoami(), $module, $field['id'])){
-                        $fieldcontentarr = get_field_content($module, $field['id'], $entryid);
-                        $result .= '<td>'.htmlspecialchars($fieldcontentarr).'</td>';
+                        if($fieldrights[$field['id']]){
+                        $fieldcontent = $allcontent[$entryid][$field['id']];
+                        $result .= '<td>'.$fieldcontent.'</td>';
                     }
                 }
             }
@@ -537,20 +541,30 @@ function render_module($module,$massaction = '0'){
     if (get_right(whoami(), $module, 'write') && $massaction == '1'){
         $result .= " <table>"
                 . "     <tr>"
-                . "         <td>"
-                . "             <button class='btn waves-effect light-blue' type='submit' name='deleteentries'>"
+                . "         <td class='center-align'>"
+                . "             <button class='btn waves-effect light-blue' type='submit' name='deleteentries' style='width:100%'>"
                 . "                 Удалить отмеченные"
                 . "             </button>"
                 . "         </td>";
         $actions = get_all_actions($module);
         if (!empty($actions)){
+            $i = 0;
+            $j = 0;
             foreach ($actions as $action){
-                $result .= "<td>"
+                $i++;
+                $result .= "<td class='center-align'>"
                         . "<input type=hidden name=massactionid value='".$action['id']."'>"
-                        . "<button class='btn waves-effect light-blue' type='submit' name='massaction'>"
+                        . "<button class='btn waves-effect light-blue' type='submit' name='massaction' style='width:100%'>"
                         . htmlspecialchars($action['name'])
                         . "</button>"
                         . "</td>";
+                if ($i%3 == 0 && $j == 0){
+                    $result .= "</tr><tr>";
+                    $j++;
+                }
+                elseif($i%4 == 0 && $j > 1){
+                    $result .= "</tr><tr>";
+                }
             }
         }
         
@@ -559,14 +573,19 @@ function render_module($module,$massaction = '0'){
         
         $fields = get_fields($module);
         if (!empty($fields)){
+            $i = 0;
             foreach ($fields as $field){
                 if ($field['updatable'] == 1){
-                    $result .= "<td>"
+                    $i++;
+                    $result .= "<td class='center-align'>"
                             . "<input type=hidden name=massupdatefieldid value='".$field['id']."'>"
-                            . "<button class='btn waves-effect light-blue' type='submit' name='massupdatefield'>"
+                            . "<button class='btn waves-effect light-blue' type='submit' name='massupdatefield' style='width:100%'>"
                             . "Обновить ".htmlspecialchars($field['name'])
                             . "</button>"
                             . "</td>";
+                    if ($i%4 == 0){
+                        $result .= "</tr><tr>";
+                    }
                 }
             }
         }
@@ -635,7 +654,7 @@ function render_entry($module, $entryid){
                             . htmlspecialchars($field['name'])
                             . '     </td>'
                             . '     <td>'
-                            . htmlspecialchars($fieldcontentarr)
+                            . $fieldcontentarr
                             . '     </td>'
                             . '     <td width=10%>';
                     if ($field['updatable'] == 1 && get_field_right(whoami(), $module, $field['id'], 'write')){
@@ -766,7 +785,7 @@ function render_fields_edit($module){
             . '         </td>'
             . '         <td>';
         if ($field['updatable'] == 1){
-            $result .= '             <input id="fields['.htmlspecialchars($field['id']).'][newfieldname]" name="fields['.htmlspecialchars($field['id']).'][updatable]" type="checkbox" checked="checked" class="filled-in">';
+            $result .= '             <input id="fields['.htmlspecialchars($field['id']).'][updatable]" name="fields['.htmlspecialchars($field['id']).'][updatable]" type="checkbox" checked="checked" class="filled-in">';
         }
         else{
             $result .= '             <input id="fields['.htmlspecialchars($field['id']).'][updatable]" name="fields['.htmlspecialchars($field['id']).'][updatable]" type="checkbox" class="filled-in">';
@@ -1054,11 +1073,11 @@ function render_module_actions($module,$entryid){
                 if(get_action_right(whoami(), $module, $action['id'])){
                     $i++;
                     $result.="<td>"
-                            . '       <button class="btn waves-effect light-blue" type="submit" name="action['.$action['id'].']">'
+                            . '       <button class="btn waves-effect light-blue" type="submit" name="action['.$action['id'].']" style="width:100%">'
                             .               htmlspecialchars($action['name'])
                             . '        </button>'
                             . '</td>';
-                    if($i%5 == 0){
+                    if($i%4 == 0){
                         $result.= "<tr></tr>";
                     }
                 }
