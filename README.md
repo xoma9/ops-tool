@@ -26,3 +26,8 @@
 
 Галка "обновляемое" в настройках полей модуля нужна для того, чтобы добавить внутри записей модуля напротив нужного поля кнопку обновления значения. Работает это так: есть, например, скрипт, который может по логину пользователя определить IP, собрав данные с какого-нибудь DHCP-сервера и вывести полученное значение в stdout. Мы ставим галку "Обновляемое", выбираем из выпадающего списка этот скрипт, собираем строку с аргументами. После этого по нажатию кнопки "Обновить", ops-tool запустит скрипт с указанными аргументами и вставит в соответствующее поле все, что скрипт вывел в stdout. Обновлять значения полей можно и массово
 
+###Скриншоты:
+![alt text](https://github.com/xoma9/ops-tool/blob/master/screenshots/screenshot.png)
+![alt text](https://github.com/xoma9/ops-tool/blob/master/screenshots/screenshot_2.png)
+![alt text](https://github.com/xoma9/ops-tool/blob/master/screenshots/screenshot_3.png)
+![alt text](https://github.com/xoma9/ops-tool/blob/master/screenshots/screenshot_4.png)
