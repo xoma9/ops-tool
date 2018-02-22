@@ -553,8 +553,7 @@ function render_module($module,$massaction = '0'){
             foreach ($actions as $action){
                 $i++;
                 $result .= "<td class='center-align'>"
-                        . "<input type=hidden name=massactionid value='".$action['id']."'>"
-                        . "<button class='btn waves-effect light-blue' type='submit' name='massaction' style='width:100%'>"
+                        . "<button class='btn waves-effect light-blue' type='submit' name='massaction[".$action['id']."]' style='width:100%'>"
                         . htmlspecialchars($action['name'])
                         . "</button>"
                         . "</td>";
@@ -562,7 +561,7 @@ function render_module($module,$massaction = '0'){
                     $result .= "</tr><tr>";
                     $j++;
                 }
-                elseif($i%4 == 0 && $j > 1){
+                elseif($i%4 == 0 && $j >= 1){
                     $result .= "</tr><tr>";
                 }
             }
@@ -578,8 +577,7 @@ function render_module($module,$massaction = '0'){
                 if ($field['updatable'] == 1){
                     $i++;
                     $result .= "<td class='center-align'>"
-                            . "<input type=hidden name=massupdatefieldid value='".$field['id']."'>"
-                            . "<button class='btn waves-effect light-blue' type='submit' name='massupdatefield' style='width:100%'>"
+                            . "<button class='btn waves-effect light-blue' type='submit' name='massupdatefield[".$field['id']."]' style='width:100%'>"
                             . "Обновить ".htmlspecialchars($field['name'])
                             . "</button>"
                             . "</td>";
