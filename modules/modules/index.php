@@ -147,23 +147,29 @@ if (get_right(whoami(), current_module())){
                         }
                     }
                         
-                    if (isset($_POST['massaction']) && !empty($_POST['checked']) && !empty($_POST['massactionid'])){
+                    if (isset($_POST['massaction']) && !empty($_POST['checked'])){
                         $massaction = $_POST['checked'];
-                        $actionid = vf($_POST['massactionid'], 3);
+						foreach ($_POST["massaction"] as $actionid => $value){
+							$actionid = $actionid;
+						}
                         foreach ($massaction as $entryid => $on){
-                            perform_action($module,$actionid, $entryid);
-                            //update_page();
+                            perform_action($module,$actionid, $entryid);   
                         }
+						update_page();
                         
                     }
                     
-                    if (isset($_POST['massupdatefield']) && !empty($_POST['checked']) && !empty($_POST['massupdatefieldid'])){
+                    if (isset($_POST['massupdatefield']) && !empty($_POST['checked'])){
+						#print_r($_POST);
                         $massaction = $_POST['checked'];
-                        $fieldid = vf($_POST['massupdatefieldid'], 3);
+                        #$fieldid = vf($_POST['massupdatefieldid'], 3);
+						foreach ($_POST["massupdatefield"] as $fieldid => $value){
+							$fieldid = $fieldid;
+						}
                         foreach ($massaction as $entryid => $on){
                             update_field_entry($module, $entryid, $fieldid);
-                            update_page();
                         }
+						update_page();
                         
                     }
                     
